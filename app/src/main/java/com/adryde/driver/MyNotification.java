@@ -1,4 +1,4 @@
-package com.rizzo.mediame;
+package com.adryde.driver;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -9,8 +9,8 @@ import android.net.Uri;
 
 import androidx.core.app.NotificationCompat;
 
-import static com.rizzo.mediame.App.CHANNEL_2_ID;
-import static com.rizzo.mediame.App.CHANNEL_1_ID;
+import static com.adryde.driver.App.CHANNEL_2_ID;
+import static com.adryde.driver.App.CHANNEL_1_ID;
 
 /**
  * Classe Factory che genera Pending Intent e Notification per i due canali.

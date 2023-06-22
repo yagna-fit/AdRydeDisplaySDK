@@ -1,4 +1,4 @@
-package com.rizzo.mediame;
+package com.adryde.driver;
 
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import android.graphics.Color;
@@ -6,7 +6,6 @@ import android.util.Log;
 import android.widget.TextView;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 
 public class RootHelper implements IXposedHookLoadPackage {

@@ -1,10 +1,12 @@
-package com.rizzo.mediame;
+package com.adryde.driver;
 
 import android.app.Activity;
 import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.pm.ActivityInfo;
+import android.net.wifi.WifiManager;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.WindowManager;
@@ -13,9 +15,13 @@ public class App extends Application {
 
     public static final String CHANNEL_1_ID = "channel1";
     public static final String CHANNEL_2_ID = "channel2";
-    private Activity mCurrentActivity = new MainActivity();
+    public SendReceive sendReceive;
+    private Activity mCurrentActivity = new ScannerQRActivity();
     private static App mMyApp;
-    boolean isAppInBackground = true;
+    public boolean isAppInBackground = true;
+    public WifiP2pManager mManager;
+    public  WifiManager wifiManager;
+    public WifiP2pManager.Channel mChannel;
 
 
     @Override

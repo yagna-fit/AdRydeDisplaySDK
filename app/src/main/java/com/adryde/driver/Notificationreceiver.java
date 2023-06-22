@@ -1,9 +1,8 @@
-package com.rizzo.mediame;
+package com.adryde.driver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.widget.Toast;
 
 /**
  * Broadcast receiver custom per gestire l'evento di disconnessione effettuato attraverso le notifiche, tramite pending intent.
@@ -16,7 +15,7 @@ public class Notificationreceiver extends BroadcastReceiver {
         String message = intent.getStringExtra("disconnessione");
         if(message.equals("si"))
         {
-            SendReceive.getInstance().disconnetti();
+            SendReceive.getInstance().disconnectSocket();
         }
     }
 }

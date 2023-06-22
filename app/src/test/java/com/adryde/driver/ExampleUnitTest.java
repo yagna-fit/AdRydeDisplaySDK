@@ -1,4 +1,4 @@
-package com.rizzo.mediame;
+package com.adryde.driver;
 
 import org.junit.Test;
 

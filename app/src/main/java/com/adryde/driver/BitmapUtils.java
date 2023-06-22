@@ -1,4 +1,4 @@
-package com.rizzo.mediame;
+package com.adryde.driver;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

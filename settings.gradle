@@ -1,2 +1,2 @@
 include ':app'
-rootProject.name='AdRyde'
+rootProject.name='AdRydeDriver'

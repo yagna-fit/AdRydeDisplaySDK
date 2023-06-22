@@ -1,4 +1,4 @@
-package com.rizzo.mediame;
+package com.adryde.driver;
 
 /**
  * Interfaccia per gestire il click degli item della recycler view

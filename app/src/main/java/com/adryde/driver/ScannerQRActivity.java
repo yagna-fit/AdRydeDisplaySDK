@@ -1,4 +1,4 @@
-package com.rizzo.mediame;
+package com.adryde.driver;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,7 +13,6 @@ import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -29,11 +28,8 @@ import com.google.zxing.Result;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionDeniedResponse;
-import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
-import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.net.InetAddress;
 import java.util.List;
@@ -43,15 +39,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Activity che permette di scannerizzare il codice qr necessario per effettuare il pair di connessione WIFI DIRECT.
  */
 
-public class Scannerizzaqr extends AppCompatActivity implements DecodeCallback, MultiplePermissionsListener {
+public class ScannerQRActivity extends AppCompatActivity implements DecodeCallback, MultiplePermissionsListener {
 
     CodeScanner codeScanner;
     CodeScannerView scannView;
     TextView resultData,connectBtn;
     //--------------------------------
-    WifiP2pManager mManager;
-    WifiManager wifiManager;
-    WifiP2pManager.Channel mChannel;
+
     BroadcastReceiver mReceiver;
     IntentFilter mIntentFilter;
     //--------------------------------
@@ -82,16 +76,16 @@ public class Scannerizzaqr extends AppCompatActivity implements DecodeCallback, 
     }
     public void inizializza()
     {
-        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        mManager = (WifiP2pManager)getSystemService(Context.WIFI_P2P_SERVICE);
-        mChannel = mManager.initialize(this, getMainLooper(), new WifiP2pManager.ChannelListener() {
+        App.getInstance().wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        App.getInstance().mManager = (WifiP2pManager)getSystemService(Context.WIFI_P2P_SERVICE);
+        App.getInstance().mChannel = App.getInstance().mManager.initialize(this, getMainLooper(), new WifiP2pManager.ChannelListener() {
             @Override
             public void onChannelDisconnected() {
                 Toast.makeText(getApplicationContext(),"onChannelDisconnected",Toast.LENGTH_SHORT).show();
 
             }
         });
-        mReceiver = new MyBroadcastReceiver(mManager,mChannel,null,this);
+        mReceiver = new MyBroadcastReceiver(App.getInstance().mManager,App.getInstance().mChannel,this);
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_DISCOVERY_CHANGED_ACTION);
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
@@ -114,8 +108,8 @@ public class Scannerizzaqr extends AppCompatActivity implements DecodeCallback, 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                resultData.setText(result.getText());
-                connectToMac(result.getText());
+                resultData.setText(result.getText().split("\\|")[1]);
+                connectToMac(result.getText().split("\\|")[0]);
             }
         });
     }
@@ -123,11 +117,11 @@ public class Scannerizzaqr extends AppCompatActivity implements DecodeCallback, 
     @SuppressLint("MissingPermission")
     private void connectToMac(String s) {
 
-        currentMac = s;
+            currentMac = s;
         WifiP2pConfig config = new WifiP2pConfig();
         config.deviceAddress=s;
         config.groupOwnerIntent=15; //Con 15 è il group owner con 0 è il client.
-        mManager.connect(mChannel, config,new WifiP2pManager.ActionListener() {
+        App.getInstance().mManager.connect(App.getInstance().mChannel, config,new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
                 Toast.makeText(getApplicationContext(),"Connected to "+s,Toast.LENGTH_SHORT).show();
@@ -150,11 +144,10 @@ public class Scannerizzaqr extends AppCompatActivity implements DecodeCallback, 
 
     @SuppressLint("MissingPermission")
     public void startDiscoveryOfDevices() {
-        mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
+        App.getInstance().mManager.discoverPeers(App.getInstance().mChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
                 Toast.makeText(getApplicationContext(),"Discovery Re-Started",Toast.LENGTH_SHORT).show();
-
             }
 
             @Override
@@ -166,7 +159,7 @@ public class Scannerizzaqr extends AppCompatActivity implements DecodeCallback, 
     }
     @SuppressLint("MissingPermission")
     public void stopDiscoveryOfDevices() {
-        mManager.stopPeerDiscovery(mChannel, new WifiP2pManager.ActionListener() {
+        App.getInstance().mManager.stopPeerDiscovery(App.getInstance().mChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
                 Toast.makeText(getApplicationContext(),"Discovery Stopped",Toast.LENGTH_SHORT).show();
@@ -221,7 +214,7 @@ public class Scannerizzaqr extends AppCompatActivity implements DecodeCallback, 
      */
 
     public void setWifiOn() {
-        wifiManager.setWifiEnabled(true);
+        App.getInstance().wifiManager.setWifiEnabled(true);
     }
     /**
      * Registra il receiver

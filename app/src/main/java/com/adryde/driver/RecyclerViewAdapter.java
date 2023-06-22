@@ -1,4 +1,4 @@
-package com.rizzo.mediame;
+package com.adryde.driver;
 
 import android.content.Context;
 import android.view.LayoutInflater;

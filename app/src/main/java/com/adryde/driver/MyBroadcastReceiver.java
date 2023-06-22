@@ -1,12 +1,9 @@
-package com.rizzo.mediame;
+package com.adryde.driver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.NetworkInfo;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
-import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
@@ -29,21 +26,16 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
 
     private WifiP2pManager mManager;
     private WifiP2pManager.Channel mChannel;
-    private Generaqr generaActivity;
-    private Scannerizzaqr scannerizzaActivity;
+    private ScannerQRActivity scannerizzaActivity;
 
-    public MyBroadcastReceiver(WifiP2pManager wifiP2pManager, WifiP2pManager.Channel channel, Generaqr activity1, Scannerizzaqr activity2) {
+    public MyBroadcastReceiver(WifiP2pManager wifiP2pManager, WifiP2pManager.Channel channel, ScannerQRActivity activity2) {
         this.mManager = wifiP2pManager;
         this.mChannel = channel;
-        this.generaActivity = activity1;
         this.scannerizzaActivity=activity2;
     }
     public AppCompatActivity getCorrectActivity()
     {
-        if(generaActivity!=null)
-            return (AppCompatActivity)generaActivity;
-        else
-            return (AppCompatActivity)scannerizzaActivity;
+         return (AppCompatActivity)scannerizzaActivity;
     }
 
 
@@ -54,27 +46,16 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
         if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
             int state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1);
             if (state == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
-                getCorrectActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getCorrectActivity(), "Wifi is ON", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                getCorrectActivity().runOnUiThread(() -> Toast.makeText(getCorrectActivity(), "Wifi is ON", Toast.LENGTH_SHORT).show());
             } else {
-                getCorrectActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getCorrectActivity(), "Wifi is OFF", Toast.LENGTH_SHORT).show();
-                        if(generaActivity!=null)
-                            generaActivity.setWifiOn();
-                        else
-                            scannerizzaActivity.setWifiOn();
-                    }
+                getCorrectActivity().runOnUiThread(() -> {
+                    Toast.makeText(getCorrectActivity(), "Wifi is OFF", Toast.LENGTH_SHORT).show();
+                    scannerizzaActivity.setWifiOn();
                 });
             }
 
         } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
-            Log.v("Connessione", "Peer cambiati");
+            Log.v("BroadcastEvent", "WIFI_P2P_PEERS_CHANGED_ACTION");
             WifiP2pDeviceList list = intent.getParcelableExtra(WifiP2pManager.EXTRA_P2P_DEVICE_LIST);
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
             if (mManager == null) {
@@ -82,7 +63,7 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
             }
             NetworkInfo networkInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
             if (networkInfo.isConnected()) {
-                mManager.requestConnectionInfo(mChannel,(generaActivity!=null)?generaActivity.connectionInfoListener:scannerizzaActivity.connectionInfoListener);
+                mManager.requestConnectionInfo(mChannel,scannerizzaActivity.connectionInfoListener);
             } else {
                 getCorrectActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -92,7 +73,7 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
                 });
             }
         } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
-            if(generaActivity!=null) {
+          /*  if(generaActivity!=null) {
                 WifiP2pDevice device = (WifiP2pDevice) intent
                         .getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE);
                 String macAddress =getMacAddr();
@@ -103,7 +84,7 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
                         generaActivity.generaQR(myMac);
                     }
                 });
-            }
+            }*/
         }
         else if (WifiP2pManager.WIFI_P2P_DISCOVERY_CHANGED_ACTION.equals(action)) {
             int state = intent.getIntExtra(WifiP2pManager.EXTRA_DISCOVERY_STATE, 10000);
@@ -111,20 +92,13 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
             {
                 // Wifi P2P discovery started.
                 getCorrectActivity().runOnUiThread(() -> {
-                    if(scannerizzaActivity!=null)
-                        Toast.makeText(scannerizzaActivity,"Discovery Start "+ state,Toast.LENGTH_SHORT).show();
-                    else {
-                        Toast.makeText(generaActivity,"Discovery Start "+ state,Toast.LENGTH_SHORT).show();
-
-                    }
-
+                    Toast.makeText(scannerizzaActivity,"Discovery Start "+ state,Toast.LENGTH_SHORT).show();
                 });
             }
             else
             {
                 getCorrectActivity().runOnUiThread(() -> {
-                    if(scannerizzaActivity!=null)
-                    {
+
                         Toast.makeText(scannerizzaActivity,"Discovery Stop "+ state,Toast.LENGTH_SHORT).show();
 
                         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
@@ -132,14 +106,7 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
                             public void run() {
                                 scannerizzaActivity.startDiscoveryOfDevices();
                             }
-                        },5000);
-
-                    }
-
-                    else {
-                        Toast.makeText(generaActivity,"Discovery Stop "+ state,Toast.LENGTH_SHORT).show();
-
-                    }
+                        },1000);
 
                 });
                 // Wifi P2P discovery stopped.

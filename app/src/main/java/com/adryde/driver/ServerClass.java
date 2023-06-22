@@ -1,4 +1,4 @@
-package com.rizzo.mediame;
+package com.adryde.driver;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -25,10 +25,9 @@ public class ServerClass extends Thread {
     private RecyclerViewAdapter stron;
     private ContentResolver contentResolver;
     private NotificationManagerCompat notificationManager;
-    private boolean client=false;
-    private Context context;
+   private Context context;
 
-    public ServerClass(boolean isclient,Handler hand, AtomicBoolean b, String cha, RecyclerViewAdapter str, ContentResolver cont,NotificationManagerCompat not,Context contx)
+    public ServerClass(Handler hand, AtomicBoolean b, String cha, RecyclerViewAdapter str, ContentResolver cont,NotificationManagerCompat not,Context contx)
     {
         handler=hand;
         connesso=b;
@@ -36,7 +35,6 @@ public class ServerClass extends Thread {
         stron=str;
         chache=cha;
         notificationManager=not;
-        client=isclient;
         context=contx;
     }
 
@@ -54,10 +52,14 @@ public class ServerClass extends Thread {
                     Toast.makeText(context, "Service ready", Toast.LENGTH_LONG).show();
                 }
             });
-            SendReceive sendReceive = new SendReceive(socket,15,connesso,chache,stron,contentResolver,notificationManager,handler, context);
-            sendReceive.start();
-            if(client)
-            sendReceive.write("send_media","send_media".getBytes());
+
+            if(App.getInstance().sendReceive== null) {
+                App.getInstance().sendReceive = new SendReceive(socket,15,connesso,chache,stron,contentResolver,notificationManager,handler, context);
+            }
+            if( App.getInstance().sendReceive.getState() ==  Thread.State.NEW) {
+                App.getInstance().sendReceive .start();
+            }
+
 
         } catch (IOException e) {
             e.printStackTrace();
