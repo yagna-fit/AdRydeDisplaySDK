@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.net.InetAddress;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -59,13 +60,14 @@ public class SharingMedia extends AppCompatActivity implements View.OnClickListe
         server.start();
 
         radiogrp.setOnCheckedChangeListener((group, checkedId) -> {
-            if(checkedId == location1.getId()){
-                App.getInstance().sendReceive.packgeChange( getPackage(1));
+            if(SendReceive.getInstance()!=null) {
+                if (checkedId == location1.getId()) {
+                    SendReceive.getInstance().packgeChange(getPackage(1));
 
-            }
-            else {
-                App.getInstance().sendReceive.packgeChange( getPackage(2));
+                } else {
+                    SendReceive.getInstance().packgeChange(getPackage(2));
 
+                }
             }
         });
 
@@ -78,12 +80,14 @@ public class SharingMedia extends AppCompatActivity implements View.OnClickListe
             ads.packageId = "1001";
             for (int i = 1; i <= 15; i++) {
                 MediaModel mm = new MediaModel();
-                mm.fileType = MediaModel.MediaType.IMAGE;
+                mm.fileType = MediaType.IMAGE;
                 mm.id = "Adryde Ad (" + i + ").jpg";
+                mm.imageAdsDuration = 5;
                 ads.mediaFiles.add(mm);
+
                 if (i <= 7) {
                     MediaModel mmV = new MediaModel();
-                    mmV.fileType = MediaModel.MediaType.IMAGE;
+                    mmV.fileType = MediaType.VIDEO;
                     mmV.id = "Adryde Video (" + i + ").mp4";
                     ads.mediaFiles.add(mmV);
                 }
@@ -95,15 +99,16 @@ public class SharingMedia extends AppCompatActivity implements View.OnClickListe
             {
 
                     MediaModel mm = new MediaModel();
-                    mm.fileType= MediaModel.MediaType.IMAGE;
+                    mm.fileType= MediaType.IMAGE;
                     mm.id = "Adryde Ad ("+i+").jpg";
+                    mm.imageAdsDuration = 10;
                     ads.mediaFiles.add(mm);
 
                 int vid = i-8;
                 if(vid<=14){
                     MediaModel mmV = new MediaModel();
-                    mmV.fileType= MediaModel.MediaType.IMAGE;
-                    mmV.id = "Adryde Video ("+i+").mp4";
+                    mmV.fileType= MediaType.VIDEO;
+                    mmV.id = "Adryde Video ("+vid+").mp4";
                     ads.mediaFiles.add(mmV);
                 }
             }
@@ -119,13 +124,14 @@ public class SharingMedia extends AppCompatActivity implements View.OnClickListe
             }
             if (msg.what == SendReceive.SEND_MEDIA) {
                 int checkedId = radiogrp.getCheckedRadioButtonId();
-                if(checkedId == location1.getId()){
-                    App.getInstance().sendReceive.packgeChange( getPackage(1));
+                if(SendReceive.getInstance()!=null) {
+                    if (checkedId == location1.getId()) {
+                        SendReceive.getInstance().packgeChange(getPackage(1));
 
-                }
-                else {
-                    App.getInstance().sendReceive.packgeChange( getPackage(2));
+                    } else {
+                        SendReceive.getInstance().packgeChange(getPackage(2));
 
+                    }
                 }
             }
         }
@@ -168,7 +174,7 @@ public class SharingMedia extends AppCompatActivity implements View.OnClickListe
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                 startActivity(intent);
                                 finish();
-                                App.getInstance().sendReceive.cancel();
+                                SendReceive.getInstance().cancel();
                             }
 
                             @Override
@@ -185,7 +191,7 @@ public class SharingMedia extends AppCompatActivity implements View.OnClickListe
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intent);
                         finish();
-                        App.getInstance().sendReceive.cancel();
+                        SendReceive.getInstance().cancel();
 
                     }
                 }

@@ -36,6 +36,8 @@ import android.os.Handler;
 
 import androidx.core.app.NotificationManagerCompat;
 
+import com.google.gson.Gson;
+
 /**
  * Thread che realizza effettivamente il servizio in background di invio e ricezione dei messaggi sul socket TCP.
  * Questo thread viene instanziato ugualmente su client e server, per predisporre l'applicazione in futuro per implementare
@@ -445,14 +447,14 @@ public class SendReceive extends Thread {
 
     private void sendNewPackageDetails() {
         int fileLimitPerTransaction = 15;
-        MediaIdsPaths queryresult = prepareMediaToSend(fileSharedPerPackage, fileLimitPerTransaction);
+       // MediaIdsPaths queryresult = prepareMediaToSend(fileSharedPerPackage, fileLimitPerTransaction);
         StringBuilder new_header = new StringBuilder();
-        if (fileSharedPerPackage == 0) {
+      //  if (fileSharedPerPackage == 0) {
             new_header.append("new_packge");
             new_header.append("=");
             new_header.append(currentPackage.packageId);
-            new_header.append("=");
-        }
+         new_header.append("=");
+         /*  }
         else {
             new_header.append("old_packge");
             new_header.append("=");
@@ -479,8 +481,10 @@ public class SendReceive extends Thread {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-        write(new_header.toString(), "".getBytes());
+        }*/
+        Gson gson = new Gson();
+        String json = gson.toJson(currentPackage);
+        write(new_header.toString(), json.getBytes());
     }
 
     /**

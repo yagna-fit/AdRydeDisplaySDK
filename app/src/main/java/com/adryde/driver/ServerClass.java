@@ -46,19 +46,17 @@ public class ServerClass extends Thread {
             socket = serverSocket.accept();
             connesso.set(true);
             notificationManager.notify(0,MyNotification.getServiceNotification(context));
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(context, "Service ready", Toast.LENGTH_LONG).show();
-                }
-            });
+            handler.post(() -> Toast.makeText(context, "Service ready", Toast.LENGTH_LONG).show());
 
-            if(App.getInstance().sendReceive== null) {
+           /* if(App.getInstance().sendReceive== null) {
                 App.getInstance().sendReceive = new SendReceive(socket,15,connesso,chache,stron,contentResolver,notificationManager,handler, context);
             }
             if( App.getInstance().sendReceive.getState() ==  Thread.State.NEW) {
                 App.getInstance().sendReceive .start();
-            }
+            }*/
+
+            SendReceive sendReceive = new SendReceive(socket,15,connesso,chache,stron,contentResolver,notificationManager,handler, context);
+            sendReceive .start();
 
 
         } catch (IOException e) {

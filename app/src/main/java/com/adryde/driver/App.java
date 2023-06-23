@@ -15,7 +15,7 @@ public class App extends Application {
 
     public static final String CHANNEL_1_ID = "channel1";
     public static final String CHANNEL_2_ID = "channel2";
-    public SendReceive sendReceive;
+    //public SendReceive sendReceive;
     private Activity mCurrentActivity = new ScannerQRActivity();
     private static App mMyApp;
     public boolean isAppInBackground = true;

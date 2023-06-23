@@ -4,17 +4,6 @@ import android.content.Context;
 
 public class MediaModel {
 
-    public enum MediaType {
-
-        IMAGE,
-
-        VIDEO,
-
-        JSON,
-
-        UNKNOWN
-    }
-
     public String id;
 
     public String getLocalPath(Context context) {
@@ -29,6 +18,7 @@ public class MediaModel {
     public String size;
     public MediaType fileType;
     public String mimeType;
+    public int imageAdsDuration=10;
 
 
 }
