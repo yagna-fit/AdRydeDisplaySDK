@@ -1,26 +1,81 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
+apply plugin: 'maven-publish'
 
 buildscript {
+    ext.kotlin_version = '1.8.10'
     repositories {
         google()
         jcenter()
-        
+
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.3.1'
-        
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
 }
 
+def githubPropertiesFile = rootProject.file("github.properties");
+def githubProperties = new Properties()
+githubProperties.load(new FileInputStream(githubPropertiesFile))
+
 allprojects {
     repositories {
         google()
         jcenter()
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/yagna-fit/AdRydeDisplaySDK")
+
+            credentials {
+                username = githubProperties['gpr.usr'] ?: System.getenv("GPR_USER")
+                password = githubProperties['gpr.key'] ?: System.getenv("GPR_API_KEY")
+            }
+        }
     }
 }
+
+
+/**
+ * For versioning and artifactory publish
+ */
+
+
+def versionPropsFile = file('versions.properties')
+
+Properties versionProps = new Properties()
+if (!versionPropsFile.exists()) {
+    versionProps['VERSION_MAJOR'] = "1"
+    versionProps['VERSION_MINOR'] = "0"
+    versionProps['VERSION_PATCH'] = "0"
+    versionProps['VERSION_BUILD'] = "1"
+    versionProps.store(versionPropsFile.newWriter(), null)
+}
+
+if (versionPropsFile.canRead()) {
+    versionProps.load(new FileInputStream(versionPropsFile))
+
+    //versionProps['VERSION_PATCH'] = (versionProps['VERSION_PATCH'].toInteger() + 1).toString()
+    versionProps['VERSION_BUILD'] = (versionProps['VERSION_BUILD'].toInteger() + 1).toString()
+
+    versionProps.store(versionPropsFile.newWriter(), null)
+} else {
+    throw new FileNotFoundException("Version Properties file not found!!!")
+}
+
+ext.versionProps = versionProps
+def currentVersionName = "${versionProps['VERSION_MAJOR']}.${versionProps['VERSION_MINOR']}.${versionProps['VERSION_PATCH']}.${versionProps['VERSION_BUILD']}"
+def currentVersionCode = (100000000 * versionProps['VERSION_MAJOR'].toInteger()) \
+                 + (1000000 * versionProps['VERSION_MINOR'].toInteger()) \
+                 + (10000 * versionProps['VERSION_PATCH'].toInteger()) \
+                 + versionProps['VERSION_BUILD'].toInteger()
+ext.currentVersionName = currentVersionName
+ext.currentVersionCode = currentVersionCode
+
 
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+

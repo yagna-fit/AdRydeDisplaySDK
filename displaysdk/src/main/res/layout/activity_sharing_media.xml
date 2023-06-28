@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:label="Sharing Service"
+    tools:context="com.adryde.mobile.displaysdk.SharingMedia">
+<RadioGroup
+    android:id="@+id/radiogrp1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0.497"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/imgshare">
+
+    <RadioButton
+        android:id="@+id/location1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:gravity="center"
+        android:autoSizeTextType="uniform"
+        android:text="Location 1"
+        android:textColor="#000"
+        android:checked="true"
+        android:textStyle="bold"
+        />
+
+    <RadioButton
+        android:id="@+id/location2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:gravity="center"
+        android:autoSizeTextType="uniform"
+        android:text="Location 2"
+        android:textColor="#000"
+        android:textStyle="bold" />
+
+</RadioGroup>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/btndisconnect"
+        app:layout_constraintTop_toBottomOf="@id/radiogrp1"
+        >
+
+        <TextView
+            android:id="@+id/fileDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/btndisconnect"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="90dp"
+        android:layout_width="match_parent"
+        android:background="@drawable/bg_btn3"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginRight="25dp"
+        android:layout_marginLeft="25dp"
+        android:paddingLeft="20dp"
+        android:paddingTop="20dp"
+        android:paddingRight="20dp"
+        android:paddingBottom="20dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/baseline_power_off_white_48"></ImageView>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="30dp"
+            android:gravity="center_vertical"
+            android:text="Disconnect"
+            android:textColor="#FFF"
+            android:textSize="25sp"
+            android:autoSizeTextType="uniform"></TextView>
+    </LinearLayout>
+
+
+    <ImageView
+        android:id="@+id/imgshare"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:src="@drawable/bg_btn3"
+        app:layout_constraintBottom_toTopOf="@+id/btndisconnect"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
