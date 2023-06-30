@@ -14,13 +14,17 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:required="true" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" android:required="true" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" android:required="true" />
+
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" android:required="true" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" android:required="true" />
     <uses-permission android:name="android.permission.INTERNET" android:required="true" />
 
     <application>
         <activity android:name="SharingMedia"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme"
+            android:usesCleartextTraffic="true"
+            />
         <activity
             android:theme="@style/AppTheme"
             android:name="ScannerQRActivity"
@@ -28,6 +32,20 @@
             android:launchMode="singleTask" />
 
         <receiver android:name="Notificationreceiver"/>
+        <receiver
+            android:name=".locationtrack.LocationUpdatesBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.adryde.mobile.displaysdk.locationtrack.action.ACTION_PROCESS_UPDATES" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="com.amazonaws.mobileconnectors.s3.transferutility.TransferService"
+            android:enabled="true" />
+
+
+
     </application>
 
 </manifest>

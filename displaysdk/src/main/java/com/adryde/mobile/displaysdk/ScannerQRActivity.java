@@ -35,10 +35,6 @@ import java.net.InetAddress;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * Activity che permette di scannerizzare il codice qr necessario per effettuare il pair di connessione WIFI DIRECT.
- */
-
 public class ScannerQRActivity extends AppCompatActivity implements DecodeCallback, MultiplePermissionsListener {
 
     CodeScanner codeScanner;
@@ -61,7 +57,6 @@ public class ScannerQRActivity extends AppCompatActivity implements DecodeCallba
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scannerizzaqr);
-
         scannView = findViewById(R.id.scannerView);
         codeScanner = new CodeScanner(this,scannView);
         resultData = (TextView) findViewById(R.id.resultQR);
@@ -75,9 +70,9 @@ public class ScannerQRActivity extends AppCompatActivity implements DecodeCallba
             }
         });
 
-        inizializza();
+        initialize();
     }
-    public void inizializza()
+    public void initialize()
     {
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         mManager = (WifiP2pManager)getSystemService(Context.WIFI_P2P_SERVICE);
@@ -98,8 +93,6 @@ public class ScannerQRActivity extends AppCompatActivity implements DecodeCallba
         startDiscoveryOfDevices();
         connesso=new AtomicBoolean();
         connesso.set(false);
-
-
     }
 
     /**
@@ -156,7 +149,6 @@ public class ScannerQRActivity extends AppCompatActivity implements DecodeCallba
             @Override
             public void onFailure(int reason) {
                 Toast.makeText(getApplicationContext(),"Discovery Start Failed "+reason,Toast.LENGTH_SHORT).show();
-
             }
         });
     }

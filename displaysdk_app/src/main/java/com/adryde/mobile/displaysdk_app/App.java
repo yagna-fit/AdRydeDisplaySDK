@@ -14,7 +14,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.WindowManager;
 
+import com.adryde.mobile.displaysdk.util.UtilsKt;
+import com.adryde.mobile.util.EncSharedPreferences;
 
+import kotlin.Unit;
+
+
+//@HiltAndroidApp
 public class App extends Application {
 
 
@@ -32,7 +38,8 @@ public class App extends Application {
         super.onCreate();
         mMyApp = (App) this.getApplicationContext();
         createNotificationChannels();
-        setScreenOrientation();
+        EncSharedPreferences.Companion.init(this.getApplicationContext());
+
 
     }
     public static synchronized App getInstance() {

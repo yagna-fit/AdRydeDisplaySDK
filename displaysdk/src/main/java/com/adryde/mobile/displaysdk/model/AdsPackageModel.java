@@ -1,4 +1,6 @@
-package com.adryde.mobile.displaysdk;
+package com.adryde.mobile.displaysdk.model;
+
+import com.adryde.mobile.displaysdk.MediaModel;
 
 import java.util.ArrayList;
 

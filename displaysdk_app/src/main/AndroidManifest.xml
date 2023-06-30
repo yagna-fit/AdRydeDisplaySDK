@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.adryde.mobile.displaysdk_app">
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -22,6 +23,7 @@
         android:supportsRtl="true"
         android:screenOrientation="portrait"
         android:name="App"
+        android:usesCleartextTraffic="true"
         android:theme="@style/Theme.AdRydeDisplaySDK">
         <activity
             android:name="com.adryde.mobile.displaysdk_app.MainActivity"

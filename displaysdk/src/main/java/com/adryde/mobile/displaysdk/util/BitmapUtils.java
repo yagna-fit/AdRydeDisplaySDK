@@ -1,4 +1,4 @@
-package com.adryde.mobile.displaysdk;
+package com.adryde.mobile.displaysdk.util;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

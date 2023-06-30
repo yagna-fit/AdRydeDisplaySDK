@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav_graph"
+    app:startDestination="@id/main">
+
+    <fragment
+        android:id="@+id/main"
+        android:name="com.adryde.mobile.displaysdk_app.MainFragment"
+        android:label="fragment_main"
+        tools:layout="@layout/fragment_main">
+        <deepLink
+            android:id="@+id/deepLink0"
+            app:uri="nitara://cattle/main_test_page" />
+    </fragment>
+
+</navigation>

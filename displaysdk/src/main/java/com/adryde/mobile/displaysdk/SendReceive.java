@@ -1,13 +1,28 @@
 package com.adryde.mobile.displaysdk;
 
+import static com.adryde.mobile.displaysdk.util.UtilsKt.downloadFile;
+
 import android.app.Notification;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.util.Log;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
+
+import com.adryde.mobile.displaysdk.data.user.model.MediaFilesDataModel;
+import com.adryde.mobile.displaysdk.data.user.model.PackageDataResponse;
+import com.google.gson.Gson;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -19,6 +34,8 @@ import java.net.Socket;
 import java.net.URLConnection;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -28,11 +45,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import android.os.Handler;
-
-import androidx.core.app.NotificationManagerCompat;
-
-import com.google.gson.Gson;
+import kotlinx.coroutines.Dispatchers;
+import kotlinx.coroutines.GlobalScope;
 
 /**
  * Thread che realizza effettivamente il servizio in background di invio e ricezione dei messaggi sul socket TCP.
@@ -64,7 +78,8 @@ public class SendReceive extends Thread {
     public static int SEND_MEDIA = 1;
     private ProgressDialog pr;
     String elapsedTime = "";
-    private AdsPackageModel currentPackage;
+    private PackageDataResponse currentPackage;
+
 
     public SendReceive(Socket skt, int ty, AtomicBoolean b, String chache, RecyclerViewAdapter strnz, ContentResolver cont, NotificationManagerCompat nom, Handler hand, Context context) {
         this.context = context;
@@ -112,6 +127,7 @@ public class SendReceive extends Thread {
         //ExecutorService executor = Executors.newCachedThreadPool();
         while (socket != null && !socket.isClosed()) {
             try {
+
                 Log.v("Connessione", socket.toString());
                 if (!socket.isConnected() && !connesso.get()) {
                     disconnectSocket();
@@ -178,17 +194,14 @@ public class SendReceive extends Thread {
                             handler.sendMessage(msg);
                         } else if (header.contains("id")) {
                             String id = header.split(",")[0].split(":")[1];
-                            String path = GetMediaFromID(id);
+                            GetMediaFromID(id);
 
                             //   byte[] message = new byte[(int)f.length()];
                             //BufferedInputStream buf = new BufferedInputStream(new FileInputStream(f));
                             //  buf.read(message, 0, message.length);
                             //  buf.close();
                             //  write("path:hd_"+id+",",message);
-
                             //
-                            writeWholeFile(id, path);
-
                             //
                         } else if (header.contains("path")) {
                             //byte[] message = new byte[lenght-HEADER_SIZE];
@@ -256,6 +269,7 @@ public class SendReceive extends Thread {
             }
         }
     }
+
 
     private String getElapsedTime(long tStart) {
         Long timeElapsed = System.currentTimeMillis() - tStart;
@@ -394,7 +408,7 @@ public class SendReceive extends Thread {
         //  String[] ids = new String[cursor.getCount()];
 
         ArrayList<String[]> fileList = new ArrayList<>();
-        for (int j = limit; j < currentPackage.mediaFiles.size() && j < limit + n; j++) {
+        for (int j = limit; j < currentPackage.getMediaFiles().size() && j < limit + n; j++) {
             for (int i = 0; i < cursor.getCount(); i++) {
                 cursor.moveToPosition(i);
                 int dataColumnIndex = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
@@ -404,7 +418,7 @@ public class SendReceive extends Thread {
 
                 String path = cursor.getString(dataColumnIndex);
                 String name = new File(path).getName();
-                if (currentPackage.mediaFiles.get(j).id.equalsIgnoreCase(name)) {
+                if (currentPackage.getMediaFiles().get(j).getFile_name().equalsIgnoreCase(name)) {
                     paths[0] = path;
                     paths[1] = name;
                     fileList.add(paths);
@@ -420,22 +434,54 @@ public class SendReceive extends Thread {
      * @param id id del media
      * @return path del percorso del media
      */
-    public String GetMediaFromID(String id) {
-        final String[] columns = {MediaStore.Files.FileColumns.DATA, MediaStore.Files.FileColumns.DISPLAY_NAME};
-        Cursor cursor = contentResolver.query(
-                MediaStore.Files.getContentUri("external"),
-                columns,
-                MediaStore.Files.FileColumns.DATA + " like ? ",
-                new String[]{"%/AdRyde/"+id},
-                null);
-        cursor.moveToPosition(0);
-        int idcolumn = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
-        String res = cursor.getString(idcolumn);
-        return res.toString();
+    public void GetMediaFromID(String id) {
+        MediaFilesDataModel mms = new MediaFilesDataModel();
+        List<MediaFilesDataModel> files = currentPackage.getMediaFiles();
+        for(int i =0;i<files.size();i++){
+            if(files.get(i).getFile_name().equalsIgnoreCase(id)){
+                mms = files.get(i);
+                break;
+            }
+        }
+
+        String url = mms.getUrl();
+        url =  BuildConfig.BASE_URL + url;
+        UUID workId = downloadFile(context,url, mms.getFile_name());
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                LiveData<WorkInfo> liveDataStatus = WorkManager.getInstance(context).getWorkInfoByIdLiveData(workId);
+
+                liveDataStatus.observe((AppCompatActivity)context, workInfo -> {
+                    // We only care about the one output status.
+                    // Every continuation has only one worker tagged TAG_OUTPUT
+                    Log.d("liveDataStatus", "filePath: filePath");
+
+                    if (workInfo!=null && workInfo.getState().isFinished()) {
+
+                        // Normally this processing, which is not directly related to drawing views on
+                        // screen would be in the ViewModel. For simplicity we are keeping it here.
+                        String outputImageUri = workInfo.getOutputData().getString("KEY_FILE_URI");
+
+                        // If there is an output file show "See File" button
+                        if (outputImageUri!=null) {
+
+                            writeWholeFile(id, outputImageUri);
+                        }
+
+                    }
+
+                });
+            }
+        });
+
+
+
+
 
     }
 
-    public void packgeChange(AdsPackageModel ads) {
+    public void packgeChange(PackageDataResponse ads) {
         currentPackage = ads;
         fileSharedPerPackage = 0;
         sendNewPackageDetails();
@@ -448,7 +494,7 @@ public class SendReceive extends Thread {
       //  if (fileSharedPerPackage == 0) {
             new_header.append("new_packge");
             new_header.append("=");
-            new_header.append(currentPackage.packageId);
+            new_header.append(currentPackage.getPackageId());
          new_header.append("=");
          /*  }
         else {
